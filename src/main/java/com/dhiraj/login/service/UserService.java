@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor // Auto-generates constructor for final fields
 public class UserService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
     /**
      * Registers a new user with encoded password and default ROLE_USER.
