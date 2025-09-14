@@ -45,4 +45,10 @@ public class AuthController {
     public String showLoginForm() {
         return "login";
     }
+    // ✅ Optional custom login POST endpoint (not required if using Spring Security's default form login)
+    @PostMapping("/login")
+    public String processLogin() {
+        // Spring Security will handle authentication automatically
+        return "redirect:/home";
+    }
 }

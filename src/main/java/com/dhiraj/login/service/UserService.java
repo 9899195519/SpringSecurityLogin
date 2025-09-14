@@ -11,47 +11,37 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor // Auto-generates constructor for final fields
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Registers a new user with encoded password and default ROLE_USER.
-     */
     public User registerNewUser(UserRegistrationDto dto) {
-        // Check if username already exists
         if (userRepository.findUserByUsername(dto.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        // Check if password and confirm password match
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             throw new IllegalArgumentException("Passwords do not match");
         }
 
-        // Create and save new user
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole("ROLE_USER");
-
         return userRepository.save(user);
     }
 
-    /**
-     * Loads user details for Spring Security authentication.
-     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole().replace("ROLE_", "")) // removes "ROLE_" for Spring
+                .roles(user.getRole().replace("ROLE_", ""))
                 .build();
     }
 }
